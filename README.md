@@ -1,6 +1,8 @@
 # Artists-recommendation
 CoreML(VK) task for ML internship. Artists recommendation problem based on 30Music dataset. Solving useing CBOW technique.
 
+GitHub не разрешает размещать файлы > 100MB, поэтому данные сохранены на [Google Drive](https://drive.google.com/drive/folders/1lM1xFHiKYI6_7crX66-DhQ42wit3eDaQ?usp=sharing)
+
 ## Примеры результатов:
 
 ![](artists_heatmap.png)
