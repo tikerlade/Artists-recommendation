@@ -3,7 +3,7 @@ import streamlit as st
 # working with sample data.
 import numpy as np
 import pandas as pd
-import keras
+import h5py
 from annoy import AnnoyIndex
 
 EMBEDDING_SIZE = 128
@@ -26,8 +26,9 @@ selected_artists = st.multiselect(label='',
                                   options=artists['artist_name'])
 
 # Load model with pretrained weights
-model = keras.models.load_model('models/model_initial.hd5')
-emb_weights = model.get_weights()[0]
+hf = h5py.File('models/model_initial.hd5', 'r')
+model = hf['model_weights']['embedding_1']['embedding_1']['embeddings:0']
+emb_weights = model.value
 
 # Build index
 index = AnnoyIndex(EMBEDDING_SIZE, metric='euclidean')
