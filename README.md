@@ -1,3 +1,5 @@
+[![Heroku deployment Status](https://github.com/tikerlade/Artists-recommendation/workflows/Heroku%20deploy/badge.svg)](https://artist-recommend.herokuapp.com/)
+
 # Artists-recommendation
 CoreML(VK) task for ML internship. Artists recommendation problem based on 30Music dataset. Solving useing CBOW technique.
 
