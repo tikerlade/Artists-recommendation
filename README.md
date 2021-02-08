@@ -5,7 +5,9 @@ GitHub не разрешает размещать файлы > 100MB, поэто
 
 ## Примеры результатов:
 
-![](artists_heatmap.png)
+You can run your own tests [here](https://artist-recommend.herokuapp.com/).
+
+![](Training/artists_heatmap.png)
 
 *Чем светлее ячейка - тем более похожи авторы и наоборот*
 
