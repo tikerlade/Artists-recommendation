@@ -11,40 +11,16 @@ from annoy import AnnoyIndex
 from matplotlib import pyplot as plt
 import seaborn as sns
 
+import utils
+
 EMBEDDING_SIZE = 128
 
-
-def normalize(v):
-    norm=np.linalg.norm(v)
-    if norm==0:
-        norm=np.finfo(v.dtype).eps
-    return v/norm
-
-
-def buffer_plot_and_get(fig):
-    buf = io.BytesIO()
-    fig.savefig(buf)
-    buf.seek(0)
-    return PIL.Image.open(buf)
-
-
-def similarity_plot(artists_embedded, artists_names):
-    plt.figure(figsize=(10, 10))
-    sns.heatmap(np.dot(artists_embedded, np.transpose(artists_embedded, [1, 0])),
-                xticklabels=artists_names,
-                yticklabels=artists_names,
-                square=True,
-                annot=True
-               )
-    plt.title('Artists similarity')
-
-    img = buffer_plot_and_get(plt)
-    return img
 
 # Introduction
 st.title('Artists recommendation :microphone:')
 st.write('Choose your favourite artists and we\'ll recommend you similar')
 
+# Choosing type of working with app
 options = ('Recommendation for one artist', 'Similarity of artists')
 option = st.selectbox('Choose in which mode to work:', options)
 
@@ -53,7 +29,7 @@ artists = pd.read_csv('data/persons.csv')
 hf = h5py.File('models/model_initial.hd5', 'r')
 # Load model with pretrained weights
 model = hf['model_weights']['embedding_1']['embedding_1']['embeddings:0']
-emb_weights = model.value
+emb_weights = model[()]
 
 
 if option == options[0]:
@@ -84,8 +60,8 @@ if option == options[0]:
         actor_vector = emb_weights[encoded_artists[0]].reshape(-1, 1)
 
         # Normalize vectors
-        suggested_vectors = [normalize(v) for v in suggested_vectors]
-        actor_vector = normalize(actor_vector)
+        suggested_vectors = np.array(list(map(utils.normalize, suggested_vectors)))
+        actor_vector = utils.normalize(actor_vector)
 
         similarity = np.dot(suggested_vectors, actor_vector)
         artist_to_similarity = {suggestions[i]: similarity[i, 0] for i in range(len(suggestions))}
@@ -93,9 +69,9 @@ if option == options[0]:
         # Decode artists code to artists names
         suggestions = set(suggestions)
         suggested_artists = artists[artists['encoded_artist_id'].isin(suggestions)]
-        suggested_artists['similarity'] = suggested_artists['encoded_artist_id'].map(artist_to_similarity)
-        suggested_artists = suggested_artists.sort_values(by=['similarity'], ascending=False)
-        suggested_artists = suggested_artists.reset_index()
+        suggested_artists.loc[:, ('similarity')] = suggested_artists['encoded_artist_id'].map(artist_to_similarity)
+        suggested_artists.sort_values(by=['similarity'], ascending=False, inplace=True)
+        suggested_artists.reset_index(inplace=True)
 
         st.subheader('Your suggestions')
         st.table(suggested_artists[['artist_name', 'similarity']])
@@ -114,9 +90,11 @@ elif option == options[1]:
             new_idx = artists[artists['artist_name'].str.contains(artist)]['encoded_artist_id'].values[0]
             artists_idxs.append(int(new_idx))
 
-        # print(type(emb_weights))
         vectors = emb_weights[np.array(artists_idxs), :]
-        vectors = [normalize(v) for v in vectors]
+        vectors = np.array(list(map(utils.normalize, vectors)))
 
-        img = similarity_plot(vectors, selected_artists)
+        similarity_matrix = np.dot(vectors, vectors.T)
+        fig = utils.similarity_plot(similarity_matrix, selected_artists)
+        img = utils.plot_to_image(fig)
+
         st.image(img, use_column_width=True)
