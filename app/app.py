@@ -1,20 +1,10 @@
-import io
+"""Main logics of application."""
 
-import PIL
 import streamlit as st
-# To make things easier later, we're also importing numpy and pandas for
-# working with sample data.
 import numpy as np
 import pandas as pd
-import h5py
-from annoy import AnnoyIndex
-from matplotlib import pyplot as plt
-import seaborn as sns
 
 import utils
-
-EMBEDDING_SIZE = 128
-
 
 # Introduction
 st.title('Artists recommendation :microphone:')
@@ -26,24 +16,16 @@ option = st.selectbox('Choose in which mode to work:', options)
 
 # Load data
 artists = pd.read_csv('data/persons.csv')
-hf = h5py.File('models/model_initial.hd5', 'r')
-# Load model with pretrained weights
-model = hf['model_weights']['embedding_1']['embedding_1']['embeddings:0']
-emb_weights = model[()]
-
+emb_weights = utils.load_weights('models/model_initial.hd5')
 
 if option == options[0]:
     # Select artists
-    artists = pd.read_csv('data/persons.csv')
     st.subheader('Choose artists')
-    selected_artists = st.selectbox(label='',
-                                      options=artists['artist_name'])
+    selected_artists = st.selectbox(label='', index=0, options=artists['artist_name'])
 
     # Build index
-    index = AnnoyIndex(EMBEDDING_SIZE, metric='euclidean')
-    for idx, weights in enumerate(emb_weights):
-        index.add_item(idx, weights)
-    index.build(10)
+    st.write(emb_weights.shape)
+    index = utils.build_index(emb_weights)
 
     # Choose recommendations
     if selected_artists:
@@ -80,7 +62,6 @@ elif option == options[1]:
     # Select artists
     st.subheader('Choose artists')
     selected_artists = st.multiselect(label='', options=artists['artist_name'])
-
     compute = st.button('Compute similarity')
 
     if compute and len(selected_artists) > 1:
