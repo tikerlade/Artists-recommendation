@@ -21,7 +21,7 @@ You can run your own tests [here](https://artist-recommend.herokuapp.com/).
 - Би-2
 - Аквариум  & Дживан Гаспарян
 - DDT
-- ... (продолжение в [CoreML ноутбуке](CoreML%20(Artist%20recommendation).ipynb))
+- ... (продолжение в [CoreML ноутбуке](Training/CoreML%20(Artist%20recommendation).ipynb))
 
 ## Задача
 Ваша задача — научиться искать похожих музыкальных исполнителей.
