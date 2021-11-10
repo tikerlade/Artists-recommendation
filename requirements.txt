@@ -6,7 +6,7 @@ tqdm==4.51.0
 keras==2.4.3
 scikit_learn==0.24.1
 sentencepiece==0.1.95
-tensorflow==2.4.0
+tensorflow==2.5.2
 
 streamlit~=0.76.0
 faiss-cpu==1.6.5
